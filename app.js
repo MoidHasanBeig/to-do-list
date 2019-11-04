@@ -3,9 +3,12 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-let items = ["Buy Food","Do laundry","Study"];
+let items = ["Buy Food", "Do laundry", "Study"];
+let work = [];
 
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(express.static("public"));
 
 app.set('view engine', 'ejs');
@@ -14,7 +17,7 @@ app.listen(3000, () => {
   console.log("Server is live @ 3000");
 })
 
-app.get("/", (req,res) => {
+app.get("/", (req, res) => {
   let currentDate = new Date();
   let options = {
     weekday: 'long',
@@ -22,15 +25,31 @@ app.get("/", (req,res) => {
     month: 'long'
   }
 
-  let day = currentDate.toLocaleDateString("en-US",options);
+  let day = currentDate.toLocaleDateString("en-US", options);
 
-  res.render("list", {kindOfDay:day, newItems:items});
+  res.render("list", {
+    listTitle: day,
+    newItems: items
+  });
 
 });
 
-app.post("/", (req,res) => {
+app.post("/", (req, res) => {
   let item = req.body.addField;
-  items.push(item);
-  res.redirect("/");
+  console.log(req.body.list);
+  if (req.body.list == "Work") {
+    work.push(item);
+    res.redirect("/work");
+  } else {
+    items.push(item);
+    res.redirect("/");
+  }
 
-})
+});
+
+app.get("/work", (req, res) => {
+  res.render("list", {
+    listTitle: "Work",
+    newItems: work
+  })
+});
